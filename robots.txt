@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /editorweb/
+Disallow: /assets/vendor/
+
+Sitemap: https://www.vzvcarservis.cz/sitemap.xml
