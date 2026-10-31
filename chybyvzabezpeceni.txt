@@ -1,577 +1,1090 @@
-Dobrý den,
+﻿Dobrý den,
 
 na vašich webových stránkách www.vzvcarservis.cz jsem nalezl tyto bezpečnostní
-chyby. U každé uvádím, kde přesně se nachází, jak je závažná, co by přes ni šlo
-udělat a jak ji odstranit. Na konci zprávy najdete doporučení, jak se proti
-těmto rizikům bránit dlouhodobě.
+chyby. Prošel jsem všech 23 stránek včetně zdrojového kódu, který si běžně
+nikdo neprohlíží, dále obrázky, PDF s obchodními podmínkami, použité knihovny
+a nastavení souborů. Nic jsem neměnil a do systému nijak nezasahoval – všechno
+je založené na veřejně dostupném obsahu. Údaje zákazníků ani zaměstnanců jsem
+nestahoval a nic z toho nebylo nijak zneužito.
 
   Kontrolu provedl : Matěj Volejník
   Datum kontroly   : 31. 10. 2026
-  Kontrolovaný web : www.vzvcarservis.cz — VZV CAR SERVIS spol. s r.o.
-  Rozsah           : 23 veřejných stránek, zdrojový kód (HTML/CSS/JS),
-                     obrázky, PDF, použité knihovny, nastavení souborů
-  Způsob kontroly  : pouze čtení veřejně dostupného obsahu a archivní kopie
-                     webu. Nebyl proveden žádný zásah do systému, nebyly
-                     získány žádné údaje zákazníků ani zaměstnanců a nic
-                     nebylo zneužito.
-  Podklady         : AUDIT.md a AUDIT-UTOKOVE-CESTY.md (plné znění,
-                     scénáře útoků a kontrolní seznamy)
+  Kontrolovaný web : www.vzvcarservis.cz – VZV CAR SERVIS spol. s r.o.
 
-  Důležité: tato zpráva obsahuje seznam zranitelností, proto by neměla být
-  veřejně dostupná na webu. V nové verzi webu je proto soubor zablokovaný
-  v .htaccess i v robots.txt.
+U každé chyby najdete čtyři věci: kde přesně je, jak je závažná, co by přes ni
+šlo udělat a jak ji opravit. Na konci pak doporučení, v jakém pořadí se do
+oprav pustit a jak se proti těmto rizikům bránit dlouhodobě.
+
+Ještě jedna poznámka na úvod: tuhle zprávu nedávejte na web. Obsahuje seznam
+zranitelností a pro kohokoli, kdo by je chtěl zneužít, je to hotový návod.
+Předat ji patří jen lidem, kteří web spravují.
 
 
 ================================================================================
- 1. JAK TUTO ZPRÁVU ČÍST
+ JAK ČTU ZÁVAŽNOST
 ================================================================================
 
-Každý nález má jednu ze čtyř úrovní závažnosti:
+KRITICKÁ
+  Přes takovou chybu se dá převzít web nebo server, dostat se k datům anebo
+  přímo k penězům. Řešil bych to v řádu hodin, ne dní.
 
-  KRITICKÁ  Zneužití vede k převzetí webu nebo serveru, k úniku dat anebo
-            k přímé finanční škodě. Řešit okamžitě, v řádu hodin.
+VYSOKÁ
+  Útočník získá neoprávněný přístup, obejde ochranu nebo získá podklad pro
+  podvod. Řešil bych to do několika dnů.
 
-  VYSOKÁ    Útočník získá neoprávněný přístup, obejde ochranu nebo získá
-            podklad pro podvod. Řešit v řádu dnů.
+STŘEDNÍ
+  Samotná chyba web nezboří, ale ve spojení s jinou ano. Často jde o věci,
+  které zajímají úřad (GDPR), vyhledávače nebo zákazníky. Řešil bych to
+  do několika týdnů.
 
-  STŘEDNÍ   Chyba sama o sobě web neohrozí, ale ve spojení s další chybou
-            ano, případně poškozuje uživatele nebo firmu (GDPR, důvěra,
-            vyhledávače). Řešit v řádu týdnů.
+NÍZKÁ
+  Drobnosti, obsahové vady, zbytečná zátěž, horší přístupnost. Řeší se
+  průběžně, ale vyplatí se je neodkládat – právě z drobností vzniká dojem
+  nedbalosti a z nedbalosti bývají úspěšné útoky.
 
-  NÍZKÁ     Drobná chyba, obsahová vada, zbytečné zatížení, ztráta
-            výkonu nebo přístupnosti. Řešit průběžně.
-
-U každého nálezu najdete čtyři odstavce:
-
-  KDE JE CHYBA     přesné místo (stránka, soubor, řádek)
-  CO PŘES NI LZE UDĚLAT   dopad z pohledu útočníka
-  JAK JI OPRAVIT   konkrétní krok
-  STAV             zda je chyba v této verzi webu už opravená
-
-Přehled: celkem 40 nálezů — 2 kritické, 5 vysokých, 12 středních,
-21 nízkých. Většinu z těch, které šly opravit přímo v souborech webu,
-jsem opravil a je to u nich uvedené.
+Celkem jsem našel 40 chyb: 2 kritické, 5 vysokých, 12 středních a 21 nízkých.
+Většinu těch, které se daly opravit přímo v souborech webu, jsem opravil.
+U každé chyby proto uvádím, jestli je v nové verzi webu už vyřešená.
 
 
 ================================================================================
- 2. KRITICKÉ CHYBY — OPRAVIT OKAMŽITĚ
+ ORIENTAČNÍ PŘEHLED
+================================================================================
+
+ KRITICKÉ
+   1. Nahrávání souborů do redakčního systému bez přihlášení ....... KRITICKÁ
+   2. Administrace webu je veřejně inzerovaná ...................... KRITICKÁ
+
+ VYSOKÉ
+   3. Web neposílá žádné bezpečnostní hlavičky ..................... VYSOKÁ
+   4. Zastaralé knihovny se známými zranitelnostmi ................. VYSOKÁ
+   5. Kontaktní formulář nemá dostatečnou ochranu .................. VYSOKÁ
+   6. Chybí zásady zpracování osobních údajů (GDPR) ................ VYSOKÁ
+   7. Osobní údaje zaměstnanců na veřejném webu .................... VYSOKÁ
+
+ STŘEDNÍ
+   8. Google Maps API klíč na veřejné stránce ...................... STŘEDNÍ
+   9. Dvě různá ověření Google Search Console ...................... STŘEDNÍ
+  10. Google Tag Manager se načítá dřív než nastavení souhlasu ..... STŘEDNÍ
+  11. Údaje o návštěvnících se posílají na cizí server ............. STŘEDNÍ
+  12. Obrázek se tahal z vývojového serveru agentury ............... STŘEDNÍ
+  13. V archivní kopii byly celé weby cizích firem ................. STŘEDNÍ
+  14. E-mailová doména bez ochrany proti podvržení ................. STŘEDNÍ
+  15. Obchodní podmínky jsou z roku 2020 a neúplné ................. STŘEDNÍ
+  16. Formulář sbírá fotografie bez pravidel ....................... STŘEDNÍ
+  17. Nejednotná adresa webu (s www a bez www) ..................... STŘEDNÍ
+  18. Chybí ochrana proti "MIME sniffingu" ......................... STŘEDNÍ
+  19. Web poskytuje kompletní podklad pro podvod na účetní ......... STŘEDNÍ
+
+ NÍZKÉ
+  20. V galeriích chybí 106 fotografií ............................. NÍZKÁ
+  21. Chybí lightbox, fotky se nerozkliknou ....................... NÍZKÁ
+  22. CSS odkazuje na tři neexistující obrázky .................... NÍZKÁ
+  23. Odkaz na obrázek s dvojitou příponou ........................ NÍZKÁ
+  24. Materialize se načítalo dvakrát ............................. NÍZKÁ
+  25. Dvojitý meta tag viewport ................................... NÍZKÁ
+  26. Neplatné telefonní odkazy ................................... NÍZKÁ
+  27. Stejný mobil u dvou různých osob ............................ NÍZKÁ
+  28. "Mob" u technika je ve skutečnosti pevná linka .............. NÍZKÁ
+  29. Zkrácené popisky obrázků (alt) .............................. NÍZKÁ
+  30. U 46 obrázků chyběl popisek ................................. NÍZKÁ
+  31. Popisek formulářového pole mířil na neexistující id ......... NÍZKÁ
+  32. Stránka Služby má titulek malým písmenem a málo obsahu ....... NÍZKÁ
+  33. Formulář a vyhledávání nejsou v archivu funkční .............. NÍZKÁ
+  34. Našeptávač nabízí stránky, které neexistují .................. NÍZKÁ
+  35. Widget otevírací doby je z jiného projektu ................... NÍZKÁ
+  36. Ve widgetu je propadlé vánoční promo ......................... NÍZKÁ
+  37. Widget se sám otevírá a ukládá data bez souhlasu ............. NÍZKÁ
+  38. Zbytky jiných projektů v kódu ................................ NÍZKÁ
+  39. Překlepy a nekonzistence v textech ........................... NÍZKÁ
+  40. Chyběly robots.txt, sitemap, stránka 404 a kanonické adresy .. NÍZKÁ
+
+Kdybych měl vybrat tři věci, které bych řešil ještě dnes, jsou to chyby 1, 2
+a 7. První dvě mohou skončit převzetím serveru, třetí je nejpravděpodobnější
+cesta k podvodu s fakturou.
+
+
+================================================================================
+ NEŽ ZAČNEME: KDO NA TAKOVÝ WEB ÚTOČÍ
+================================================================================
+
+Možná vás napadne, koho by takový web zajímal. Vysokozdvižné vozíky nejsou
+bankovní tajemství. Jenže útočník nehledá vaše know-how, hledá slabé místo.
+
+Automatizovaný bot projíždí celý internet čtyřiadvacet hodin denně a hledá
+otevřené redakční systémy, nezabezpečená nahrávání souborů a staré knihovny.
+Vaše firma ho nezajímá, ale váš server je pro něj použitelný – dá se z něj
+rozesílat spam, těžit kryptoměna nebo z něj udělat odrazový můstek pro další
+útoky. Takových botů jsou miliony a váš web navštíví každý den.
+
+Podvodník hledá peníze a vy mu je nabízíte na stránce Kontakty: jméno
+jednatele, jméno a přímý mobil hlavní účetní, e-maily ve formátu
+prijmeni@vzvcarservis.cz. To je kompletní zadání pro falešnou fakturu.
+
+Bývalý dodavatel nebo zaměstnanec hledá přístup, který mu zůstal. Ten se
+nejhůř odhaluje, protože přichází z důvěryhodné adresy.
+
+Cílený útočník, který by chtěl databázi zákazníků, je nejméně pravděpodobný.
+Ale právě on způsobí největší škodu, protože si na vás udělá čas.
+
+Drtivá většina reálných incidentů u firem vaší velikosti nezačíná žádným
+"hackerským" průnikem. Začíná e-mailem, slabým heslem nebo přístupem, na
+který se zapomnělo. Proto v doporučeních nejsou na prvním místě technologie,
+ale pořádek v přístupech.
+
+
+================================================================================
+ ČÁST 1 — KRITICKÉ CHYBY
 ================================================================================
 
 --------------------------------------------------------------------------------
- K1 — Nahrávání souborů do redakčního systému bez přihlášení
- ZÁVAŽNOST: KRITICKÁ
+ 1. NAHRÁVÁNÍ SOUBORŮ DO REDAKČNÍHO SYSTÉMU BEZ PŘIHLÁŠENÍ
+    Závažnost: KRITICKÁ
 --------------------------------------------------------------------------------
- KDE JE CHYBA:
-   Kontaktní formulář na všech 23 stránkách (např. index.html, kontakty/,
-   bazar/, …). Ve skriptu "drop-area" byla adresa:
 
-       /editorweb/lib/upload.php?id=389775755
-       (na některých stránkách /editorweb/lib/upload.php?id=124140741)
+Kde to je:
+  V kontaktním formuláři na všech 23 stránkách, v části "Nahrajte fotografie".
+  Ve skriptu, který se o nahrávání stará, byla tato adresa:
 
-   Číslo složky (389775755 / 124140741) bylo viditelné ve zdrojovém kódu
-   každé stránky a bylo jediným "oprávněním".
+      /editorweb/lib/upload.php?id=389775755
+      (na některých stránkách /editorweb/lib/upload.php?id=124140741)
 
- CO PŘES NI LZE UDĚLAT:
-   - Nahrát na server jakýkoli soubor, aniž by útočník znal jediné heslo.
-     Nahrávání probíhalo hned po vložení souboru do formuláře, tedy ještě
-     před odesláním formuláře a zcela mimo ochranu reCAPTCHA.
-   - Pokud server v tomto adresáři spouští PHP (což redakční systémy tohoto
-     typu běžně dělají), nahrát vlastní skript a převzít kontrolu nad webem
-     a poté i nad serverem: měnit obsah, číst databázi, rozesílat spam
-     z vaší domény, napadnout Vaše zákazníky, vymazat web, žádat výkupné.
-   - Zkoušet jiná čísla složek (tzv. IDOR) a dostat se tak k fotografiím,
-     dokumentům nebo nahraným souborům jiných uživatelů.
-   - Zahlcovat disk serveru (bez limitu velikosti a počtu souborů).
+  Číslo složky bylo vidět ve zdrojovém kódu každé stránky a bylo jediné, co
+  nahrávání "chrání". Žádné heslo, žádné přihlášení, žádný token.
 
- JAK JI OPRAVIT:
-   1. Ověřte, zda adresa vrací bez přihlášení něco jiného než "401/403".
-      Testujte pouze vlastním obrázkem, nikdy ne skriptem.
-   2. Pokud přístupná je: endpoint dočasně zablokujte, projděte adresář
-      editorweb/filemanager/files/ (hlavně .php, .phtml, .htaccess a
-      obrázky s vloženým kódem), projděte serverové logy na požadavky
-      "POST /editorweb/" a změňte všechna hesla (CMS, FTP, SSH, databáze).
-   3. Trvale: nahrávání jen s platným přihlášením, kontrola přípony i
-      obsahu souboru, povolené jen jpg/jpeg/png/webp/pdf, maximální
-      velikost, náhodné názvy, ukládání mimo veřejný adresář a zákaz
-      spouštění skriptů v adresáři s nahranými soubory.
+Co přes ni lze udělat:
+  Nahrát na server jakýkoli soubor, aniž by útočník znal jediné heslo. Je to
+  ještě horší, než to vypadá: nahrávání probíhalo okamžitě po vložení souboru
+  do formuláře, tedy dřív, než návštěvník formulář vůbec odešle, a úplně mimo
+  ochranu reCAPTCHA. Ochranný prvek, který jste platili, se v tomto případě
+  dal obejít jediným kliknutím.
 
- STAV: v této verzi webu je nahrávání z prohlížeče vypnuté a čísla složek
-       odstraněná. Serverová část se ale musí ověřit přímo na hostingu.
+  Redakční systémy tohoto typu obvykle v adresáři s nahranými soubory spouští
+  PHP. Pokud to tak je i tady, útočník nahraje vlastní skript a převezme
+  kontrolu nad webem. Co následuje:
 
+    - změní obsah webu, vloží odkazy na podvodné stránky nebo malware,
+    - přečte databázi a stáhne si kontakty zákazníků i poptávky,
+    - začne z vaší domény rozesílat spam a phishing, takže se vaše e-maily
+      dostanou na černé listiny a přestanou chodit zákazníkům,
+    - web smaže nebo zašifruje a bude chtít výkupné,
+    - použije server jako zázemí pro útoky na jiné firmy. Pak se vyšetřování
+      obrátí na vás, protože stopa vede na vaši IP adresu.
 
---------------------------------------------------------------------------------
- K2 — Administrace webu je veřejně inzerovaná
- ZÁVAŽNOST: KRITICKÁ
---------------------------------------------------------------------------------
- KDE JE CHYBA:
-   Patička každé stránky obsahovala odkaz na redakční systém:
+  Druhá rovina je stejně nepříjemná: čísla složek se dala zkoušet. Útočník
+  nemusí hádat heslo, stačí měnit číslo a procházet obsah jiných složek –
+  fotografie, dokumenty, cokoli, co tam jiní uživatelé nahráli.
 
-       <span title="Log in to editor"
-             onclick="window.open('/editorweb/','_blank');">
+  A třetí: bez omezení velikosti a počtu souborů stačí nahrát pár velkých
+  souborů a zaplnit disk serveru. Web pak spadne i s e-maily, pokud běží na
+  stejné stroji.
 
-   Web tedy sám sděluje každému návštěvníkovi i vyhledávači: "tady je
-   administrace, zkuste to".
+Jak to opravit:
+  Za prvé je potřeba zjistit, jestli je adresa opravdu otevřená. Ověřte to
+  dotazem, který nic nemění – stačí se podívat, co server vrátí, když na
+  adresu přijdete nepřihlášený. Testujte vlastním obrázkem, nikdy ne
+  skriptem, a ideálně nejdřív na kopii webu.
 
- CO PŘES NI LZE UDĚLAT:
-   - Útočník nemusí cestu hádat ani skenovat, stačí otevřít odkaz.
-   - Zkoušet uhádnutá hesla nebo hesla z dřívějších úniků (útočníci
-     zkoušejí e-mail + stejné heslo z jiných webů).
-   - Zneužít chybu v přihlašovacím formuláři, pokud používá zastaralou
-     knihovnu nebo nemá omezený počet pokusů.
-   - Po přihlášení měnit obsah webu, vkládat škodlivý kód, mazat stránky,
-     stahovat databázi zákazníků.
+  Pokud se ukáže, že je přístupná, berte server jako napadený, dokud se
+  neprokáže opak. Projděte adresář s nahranými soubory (editorweb/filemanager/
+  files/) a hledejte soubory .php, .phtml, .htaccess a obrázky, které mají
+  uvnitř vložený kód. Projděte logy serveru na požadavky "POST /editorweb/"
+  z cizích IP adres. A změňte všechna hesla, která s webem souvisí: CMS, FTP,
+  SSH, databáze, hosting.
 
- JAK JI OPRAVIT:
-   - Odkaz z webu odstranit (v této verzi je odstraněný).
-   - Administraci chránit: dvoufázové přihlášení, silné unikátní heslo,
-     omezení podle IP adresy nebo VPN, omezení počtu pokusů.
-   - V adresáři editorweb/ zkontrolovat a smazat instalační a testovací
-     soubory (install/, setup/, phpinfo.php, test.php, zálohy, .zip).
-   - Do vyhledávačů poslat "noindex" a v robots.txt adresář zakázat.
+  Trvale pak platí: nahrávat smí jen přihlášený uživatel, kontroluje se
+  přípona i skutečný obsah souboru, povolené jsou jen jpg, jpeg, png, webp
+  a pdf, soubory se ukládají mimo veřejně dostupný adresář, mají náhodné
+  názvy a v adresáři s nahranými soubory je zakázané spouštění skriptů.
 
- STAV: odkaz odstraněn. Zabezpečení serveru je nutné dodělat.
-
-
-================================================================================
- 3. VYSOKÉ CHYBY — OPRAVIT DO NĚKOLIKA DNŮ
-================================================================================
-
---------------------------------------------------------------------------------
- K3 — Web neposílá žádné bezpečnostní hlavičky
- ZÁVAŽNOST: VYSOKÁ
---------------------------------------------------------------------------------
- KDE JE CHYBA:
-   Server neposílá hlavičky Content-Security-Policy, Strict-Transport-
-   Security, X-Frame-Options, X-Content-Type-Options, Referrer-Policy
-   ani Permissions-Policy. Ověříte příkazem:
-
-       curl -I https://www.vzvcarservis.cz/
-
- CO PŘES NI LZE UDĚLAT:
-   - Bez X-Frame-Options lze web vložit do cizí stránky a překrýt
-     neviditelnými prvky (clickjacking) — návštěvník klikne na něco
-     jiného, než vidí.
-   - Bez CSP se mnohem snáz prosadí vložený škodlivý skript (XSS); ten
-     pak může číst přihlašovací údaje, měnit obsah nebo přesměrovat
-     platby.
-   - Bez HSTS jde návštěvníka na nezabezpečenou verzi http:// a odposlechnout
-     komunikaci (u veřejných Wi-Fi běžné).
-   - Bez nosniff si prohlížeč může nahraný soubor vyložit jinak, než
-     server zamýšlel (např. obrázek s HTML uvnitř).
-
- JAK JI OPRAVIT:
-   Do .htaccess (Apache) nebo do souboru _headers (Netlify, Cloudflare
-   Pages) přidat hlavičky. Obě varianty jsou v nové verzi webu připravené.
-   Content-Security-Policy je připravená, ale zakomentovaná: nejdřív se
-   musí ověřit, jaké domény si stahuje Google Tag Manager, aby se
-   nerozbila měření. Doporučuji nejprve režim "Content-Security-Policy-
-   Report-Only", posbírat reporty a teprve pak ochranu zapnout.
-
- STAV: připraveno k nasazení (.htaccess, _headers).
+Stav:
+  V nové verzi webu je nahrávání z prohlížeče vypnuté a čísla složek jsou
+  odstraněná. Serverová část se ale musí ověřit přímo na hostingu – to za vás
+  z kódu udělat nelze.
 
 
 --------------------------------------------------------------------------------
- K4 — Zastaralé knihovny se známými zranitelnostmi
- ZÁVAŽNOST: VYSOKÁ
+ 2. ADMINISTRACE WEBU JE VEŘEJNĚ INZEROVANÁ
+    Závažnost: KRITICKÁ
 --------------------------------------------------------------------------------
- KDE JE CHYBA:
-   editorweb/js/jquery-2.1.1.min.js      jQuery 2.1.1 — rok 2014
-   editorweb/js/materialize.min.js       Materialize 0.98.0 — rok 2016
-   editorweb/css/slippry.min.js          Slippry — přibližně 2015
-   Zároveň se načítají dvě verze Font Awesome (4 i 6).
 
- CO PŘES NI LZE UDĚLAT:
-   - jQuery 2.x už není vyvíjené a má známé chyby (CVE-2019-11358,
-     CVE-2020-11022/11023, CVE-2015-9251). Pokud se výstup jQuery dostane
-     k uživatelskému vstupu, útočník do stránky vloží vlastní kód.
-   - Ukradení přihlášené relace administrátora a následná změna webu.
-   - Podvržení obsahu (falešné bankovní spojení, falešná výzva k platbě).
+Kde to je:
+  V patičce každé stránky, hned vedle copyrightu, byl odkaz na redakční
+  systém:
 
- JAK JI OPRAVIT:
-   - jQuery aktualizovat na 3.7.x, Materialize na 1.0.0 (nebo nahradit
-     vlastním CSS) a použít jedinou sadu Font Awesome.
-   - Nutné otestovat menu, modální okna, slider a formuláře — doporučuji
-     na samostatné vývojové kopii, ne přímo na produkci.
-   - Do té doby alespoň CSP z K3, která vložení cizího skriptu omezí.
+      <span title="Log in to editor"
+            onclick="window.open('/editorweb/','_blank');">
 
- STAV: neopraveno, vyžaduje migraci a testování.
+  Web tedy každému návštěvníkovi i každému vyhledávači sám sděloval: tady je
+  administrace, zkuste to.
+
+Co přes ni lze udělat:
+  Útočník nemusí cestu hádat ani skenovat porty. Otevře odkaz a má před sebou
+  přihlašovací formulář. Pak už jen zkouší:
+
+    - hesla z dřívějších úniků. Řada lidí používá stejné heslo v e-shopu,
+      v redakčním systému i v e-mailu. Útočník takové kombinace má a zkouší
+      je automaticky na tisících webů,
+    - uhádnutelná hesla typu nazevfirmy2024, sezona2025, admin123,
+    - chyby v přihlašovacím formuláři, pokud nemá omezený počet pokusů.
+
+  Po přihlášení získá totéž co vy: možnost měnit texty, nahrávat soubory,
+  mazat stránky a často i stahovat databázi. Z webu se tak stane nástroj,
+  kterým lze podvádět vaše zákazníky – a ti vám to budou věřit, protože
+  e-mail přišel z vaší adresy a odkaz vedl na váš web.
+
+Jak to opravit:
+  Odkaz z webu pryč (v nové verzi je odstraněný). To je ale jen kosmetika.
+  Podstatné je zabezpečit samotnou administraci:
+
+    - dvoufázové přihlášení. Dnes je to nejúčinnější jednotlivé opatření,
+      které existuje – i ukradené heslo je bez telefonu k ničemu,
+    - silné a unikátní heslo, uložené v password manageru, ne v sešitě,
+    - omezení přístupu na IP adresu kanceláře nebo na VPN,
+    - omezení počtu pokusů o přihlášení a zpoždění po každém neúspěchu,
+    - v adresáři editorweb/ projít a smazat instalační a testovací soubory:
+      install/, setup/, phpinfo.php, test.php, staré zálohy a .zip archivy.
+      Přesně tyhle soubory útočníci hledají jako první,
+    - do vyhledávačů poslat "noindex" a v robots.txt adresář zakázat.
+
+Stav:
+  Odkaz je odstraněný. Zabezpečení samotné administrace je věc serveru
+  a musí se dodělat tam.
 
 
---------------------------------------------------------------------------------
- K5 — Kontaktní formulář nemá dostatečnou ochranu
- ZÁVAŽNOST: VYSOKÁ
---------------------------------------------------------------------------------
- KDE JE CHYBA:
-   Formulář "Kontaktujte VZV CAR SERVIS" na všech stránkách:
-   <form action="?sentform=1#form"> — bez CSRF tokenu, bez kontroly
-   na serveru, bez omezení počtu odeslání.
-
- CO PŘES NI LZE UDĚLAT:
-   - Odesílat formulář z cizích stránek (cross-site request forgery) a
-     zaplavit schránku obchodu spamem.
-   - Zneužít formulář jako relay pro phishing — oběti dostanou e-mail
-     z vaší adresy.
-   - Zaplavit disk nahráváním souborů (viz K1).
-   - Poškodit reputaci domény: pokud začne vaše doména rozesílat spam,
-     skončí e-maily obchodu ve spamu u zákazníků.
-
- JAK JI OPRAVIT:
-   - Na serveru ověřovat reCAPTCHA (kontrola parametru g-recaptcha-response).
-   - Přidat CSRF token a honeypot, omezit počet odeslání (rate limit).
-   - Omezit přílohy: jen jpg/png, maximálně 5 MB a 5 souborů.
-   - Do formuláře doplnit zaškrtávací políčko se odkazem na zásady
-     zpracování osobních údajů (viz K6).
-
- STAV: částečně — vypnuté nebezpečné nahrávání (K1). Serverová část
-       zůstává k doplnění.
-
+================================================================================
+ ČÁST 2 — VYSOKÉ CHYBY
+================================================================================
 
 --------------------------------------------------------------------------------
- K6 — Chybí zásady zpracování osobních údajů (GDPR)
- ZÁVAŽNOST: VYSOKÁ
+ 3. WEB NEPOSÍLÁ ŽÁDNÉ BEZPEČNOSTNÍ HLAVIČKY
+    Závažnost: VYSOKÁ
 --------------------------------------------------------------------------------
- KDE JE CHYBA:
-   conditions/ — stránka "Podmínky užití" obsahuje pouze text o cookies.
-   Text je navíc okopírovaný z e-shopu (mluví o "košíku", "přihlášení",
-   "nákupním procesu"), takže na tento web vůbec nesedí.
 
- CO PŘES NI LZE UDĚLAT (z pohledu rizika pro firmu):
-   - Kontrola Úřadu pro ochranu osobních údajů může uložit pokutu.
-   - Stížnost zákazníka, který zjistí, že jeho údaje zpracováváte bez
-     informace.
-   - Ztráta důvěry a poškození jména — u B2B zákazníků citlivé téma.
+Kde to je:
+  V odpovědi serveru. Ověříte to jediným příkazem:
 
-   Na webu chybí: kdo je správce údajů, jaké údaje se sbírají a proč,
-   jak dlouho se uchovávají, komu se předávají (Google, agentura Getup,
-   hosting), poučení o právech a informace o předání do USA (Google).
+      curl -I https://www.vzvcarservis.cz/
 
- JAK JI OPRAVIT:
-   - Vytvořit stránku "Zásady ochrany osobních údajů" (čl. 13 GDPR) a
-     stránku "Nastavení cookies" s reálným přepínačem.
-   - Do textu o cookies doplnit konkrétní cookies (_ga, _gid, _gcl_au,
-     IDE…), dobu platnosti a příjemce.
-   - U formuláře nahradit větu "Odesláním souhlasíte s podmínkami užití"
-     odkazem na zásady a zaškrtávacím políčkem.
-   - Text nechat zkontrolovat právníkem.
+  V hlavičkách chybí Content-Security-Policy, Strict-Transport-Security,
+  X-Frame-Options, X-Content-Type-Options, Referrer-Policy i
+  Permissions-Policy. Web tedy prohlížeči neříká, co si smí dovolit.
 
- STAV: neopraveno, jde o právní text, ne o kód.
+Co přes ni lze udělat:
+  Bez X-Frame-Options lze váš web vložit do cizí stránky a překrýt ho
+  neviditelnými tlačítky. Návštěvník si myslí, že kliká na něco jiného, než
+  doopravdy kliká. Tomu se říká clickjacking a vypadá to jako normální
+  stránka.
 
+  Bez Content-Security-Policy se mnohem snáz prosadí vložený škodlivý skript.
+  Kdyby se cokoli takového do stránky dostalo – přes starou knihovnu, přes
+  komponentu třetí strany nebo přes reklamu – prohlížeč ho bez CSP poslušně
+  spustí. Takový skript pak může číst, co návštěvník píše do formuláře,
+  měnit číslo účtu na stránce nebo přesměrovat platbu.
+
+  Bez HSTS jde návštěvníka na nezabezpečenou verzi http:// a tam odposlechnout
+  komunikaci. U veřejných Wi-Fi na veletrzích a v servisech je to běžná věc.
+
+  Bez nosniff si prohlížeč může nahraný soubor vyložit jinak, než server
+  zamýšlel – typicky obrázek, který je uvnitř HTML stránka.
+
+Jak to opravit:
+  Doplnit hlavičky na serveru. Pro Apache je připravený soubor .htaccess,
+  pro Netlify a Cloudflare Pages soubor _headers. Obě varianty jsou v nové
+  verzi webu.
+
+  U Content-Security-Policy doporučuji postupovat opatrně. Web má stovky
+  inline skriptů a handlery přímo v HTML, takže politika musí nejdřív
+  povolit 'unsafe-inline', jinak přestane fungovat menu i formuláře. A hlavně
+  je potřeba vědět, jaké domény si stahuje Google Tag Manager, aby se
+  nerozbilo měření. Proto: nejdřív režim Content-Security-Policy-Report-Only,
+  týden sbírat reporty, opravit, co hlásí, a teprve pak ochranu zostřit.
+
+Stav:
+  Připraveno k nasazení. Na serveru je potřeba ověřit, že se hlavičky opravdu
+  posílají.
 
 --------------------------------------------------------------------------------
- K7 — Osobní údaje zaměstnanců na veřejném webu
- ZÁVAŽNOST: VYSOKÁ
+ 4. ZASTARALÉ KNIHOVNY SE ZNÁMÝMI ZRANITELNOSTMI
+    Závažnost: VYSOKÁ
 --------------------------------------------------------------------------------
- KDE JE CHYBA:
-   kontakty/ — 7 osob s funkcí, přímým mobilem a e-mailem, mimo jiné
-   jednatel (608 988 809) a hlavní účetní (778 094 428). E-maily jsou
-   ve formátu prijmeni@vzvcarservis.cz, tedy snadno uhodnutelné.
 
- CO PŘES NI LZE UDĚLAT:
-   - Cílený phishing a podvod s falešnou fakturou (BEC). Útočník ví, kdo
-     firmu řídí, kdo platí faktury a jak ho oslovit.
-   - Vishing — telefonát "z účtárny" nebo "od jednatele".
-   - Hromadný spam a vydírání (e-maily jsou veřejné a snadno dostupné
-     robotům).
-   - Sestavení organizační struktury firmy pro další útok.
+Kde to je:
+  editorweb/js/jquery-2.1.1.min.js     jQuery 2.1.1 – rok 2014
+  editorweb/js/materialize.min.js      Materialize 0.98.0 – rok 2016
+  editorweb/css/slippry.min.js         Slippry – kolem roku 2015
+  Zároveň se načítají dvě verze Font Awesome (4 i 6).
 
- JAK JI OPRAVIT:
-   - Zvážit, zda účetní a jednatel potřebují na webu přímý mobil; často
-     stačí centrální linka 469 667 178 a adresa ucetni@… / info@….
-   - Technicky: SPF, DKIM a DMARC v režimu "p=reject", dvoufázové
-     přihlášení k e-mailu, interní pravidlo, že změna bankovního spojení
-     se vždy ověřuje zpětným telefonátem na číslo z rejstříku.
-   - Školení zaměstnanců proti phishingu.
+Co přes ni lze udělat:
+  jQuery 2.x se už roky nevyvíjí a má známé chyby: CVE-2019-11358,
+  CVE-2020-11022, CVE-2020-11023 a CVE-2015-9251. Ve zkratce jde o to, že
+  pokud se výstup jQuery dostane k uživatelskému vstupu, útočník do stránky
+  vloží vlastní kód. Dnes to web nedělá – v jeho skriptech se pracuje jen
+  se statickými daty. Riziko tedy není akutní, ale je to dluh.
 
- STAV: neopraveno — je to rozhodnutí firmy, ne technická chyba.
+  Problém je v tom, jak takový dluh zestárne. Přijde požadavek "přidejte
+  vyhledávání", "přidejte výpis poptávek", "přidejte komentáře" – a najednou
+  se uživatelský vstup do staré knihovny dostane. V tu chvíli je z pohodlné
+  údržby zranitelnost. Viděl jsem to u desítek firem.
 
+Jak to opravit:
+  jQuery na 3.7.x, Materialize na 1.0.0 (nebo nahradit vlastním CSS)
+  a použít jedinou sadu Font Awesome. Není to složité, ale musí se to
+  otestovat – menu, modální okna, slider, formuláře. Rozhodně na samostatné
+  vývojové kopii, ne přímo na produkci, a s možností rychlého návratu.
 
-================================================================================
- 4. STŘEDNÍ CHYBY — OPRAVIT DO NĚKOLIKA TÝDNŮ
-================================================================================
+  Do té doby alespoň CSP z předchozího bodu, která vložení cizího skriptu
+  omezí.
 
- S1 — Google Maps API klíč na veřejné stránce            ZÁVAŽNOST: STŘEDNÍ
-   KDE: archivní kopie mapového podkladu obsahovala klíč
-        AIzaSyCmL18misQw9KdwqGaw3zHkitj8vG6QF2Y.
-   CO LZE UDĚLAT: pokud klíč není omezený, může ho kdokoli použít pro
-        tisíce požadavků a účet za Google Maps platíte vy.
-   OPRAVA: v Google Cloud Console omezit klíč na referrer
-        https://www.vzvcarservis.cz/*, povolit jen Maps Embed API,
-        nastavit upozornění na rozpočet a klíč rotovat.
-   STAV: v nové verzi webu je místo klíče mapa bez klíče. Rotace klíče
-        je stále nutná, protože byl veřejně dostupný.
+Stav:
+  Neopraveno. Vyžaduje migraci a testování, nedá se to udělat bezpečně
+  "za pochodu".
 
- S2 — Dvě různá ověření Google Search Console          ZÁVAŽNOST: STŘEDNÍ
-   KDE: index.html obsahuje dva meta tagy google-site-verification
-        (H8Hi46FoSP6pHYY_u6xLQ0CqvPJGZ9V2AIYydWaRM6A a
-        lM0wWOQjyKLnhk1ti8ZymYLNkC572bIDbbh96iX5Cu4).
-   CO LZE UDĚLAT: každý token znamená účet s ověřeným vlastnictvím domény
-        a přístupem k datům o návštěvnosti. Dva tokeny = dva subjekty,
-        pravděpodobně agentura z minulosti.
-   OPRAVA: zjistit, komu token patří, nepoužívaný token i vlastnost
-        v Search Console odebrat.
-   STAV: neopraveno (nelze bez znalosti vlastníka).
+--------------------------------------------------------------------------------
+ 5. KONTAKTNÍ FORMULÁŘ NEMÁ DOSTATEČNOU OCHRANU
+    Závažnost: VYSOKÁ
+--------------------------------------------------------------------------------
 
- S3 — Google Tag Manager se načítá dřív než nastavení souhlasu
-                                                       ZÁVAŽNOST: STŘEDNÍ
-   KDE: index.html — skript GTM je na řádku 195, nastavení výchozího
-        souhlasu (consent default) až na řádku 200.
-   CO LZE UDĚLAT: GTM může stihnout založit analytické a marketingové
-        cookies dřív, než se návštěvník rozhodne. To je přesně to, co
-        kontroluje ÚOOÚ.
-   OPRAVA: nastavit consent default v <head> před načtením GTM, nebo GTM
-        načítat až po kliknutí na lištu. Ověřit v prohlížeči (DevTools →
-        Application → Cookies), že bez kliknutí nevznikne _ga.
-   STAV: neopraveno.
+Kde to je:
+  Formulář "Kontaktujte VZV CAR SERVIS" na všech stránkách:
 
- S4 — Údaje o návštěvnících se posílají na cizí server
-                                                       ZÁVAŽNOST: STŘEDNÍ
-   KDE: assets/vendor/getup/gtmconsent.js odesílá volbu souhlasu a doménu
-        na https://getup.cz/cookie-endpoint.php.
-   CO LZE UDĚLAT: jde o předání údajů dalšímu zpracovateli; bez zmínky
-        v zásadách ochrany údajů a bez zpracovatelské smlouvy je to
-        problém při kontrole.
-   OPRAVA: endpoint vypnout nebo přesunout na vlastní doménu a doplnit
-        do zásad ochrany osobních údajů.
-   STAV: neopraveno (skript je lokálně, ale komunikaci stále dělá).
+      <form action="?sentform=1#form">
 
- S5 — Produkční web tahal obrázek z vývojového serveru agentury
-                                                       ZÁVAŽNOST: STŘEDNÍ
-   KDE: css/style_yjnp0t.css odkazovalo
-        https://vzvcarservis.getup.cz/editorweb/filemanager/files/…
-   CO LZE UDĚLAT: cizí subdoména vidí IP adresy návštěvníků a referer;
-        pokud je vývojový server veřejný, je dostupná i stará verze webu
-        (duplicitní obsah, testovací funkce).
-   OPRAVA: obrázek přesunout k vám (v nové verzi hotovo) a vývojový
-        server vypnout nebo chránit přihlášením.
-   STAV: opraveno.
+  Chybí ochranný token proti odeslání z cizího webu (CSRF), chybí kontrola
+  na serveru a chybí omezení počtu odeslání.
 
- S6 — V archivní kopii byly celé weby cizích firem   ZÁVAŽNOST: STŘEDNÍ
-   KDE: složka _ext/ obsahovala 12 MB e-shopu privesyskladem.cz (včetně
-        administrace, přihlašovacího API a klíče dopravce Packeta
-        a033c6f5889374c4) a 6,6 MB webu cfmotoservis.cz.
-   CO LZE UDĚLAT: zveřejnění cizího obsahu pod vaší doménou (autorská
-        práva, ochranné známky), duplicitní obsah pro vyhledávače a
-        prozrazení vnitřku cizí administrace.
-   OPRAVA: klony z webu odstranit (v nové verzi hotovo) a odkazy vést
-        na skutečné weby.
-   STAV: opraveno.
+Co přes ni lze udělat:
+  Formulář jde odeslat z jakékoli cizí stránky. Útočník si připraví stránku,
+  na kterou naláká návštěvníky, a jejich prohlížeče odešlou vašemu webu
+  stovky poptávek. Vy je dostanete jako e-maily.
 
- S7 — E-mailová doména bez ochrany proti podvržení   ZÁVAŽNOST: STŘEDNÍ
-   KDE: nelze poznat z webu, ověřuje se v DNS:
-        dig +short TXT vzvcarservis.cz | grep -i spf
-        dig +short TXT _dmarc.vzvcarservis.cz
-   CO LZE UDĚLAT: podvrhnout e-mail "od" vaší firmy — falešná faktura,
-        změna bankovního účtu, výzva k platbě. Jde o nejčastější cestu
-        ke skutečné finanční škodě.
-   OPRAVA: SPF s "-all", platný DKIM, DMARC "p=reject", DNSSEC a
-        uzamčení domény u registrátora.
-   STAV: mimo web, nutno ověřit u poskytovatele DNS.
+  Druhá varianta je horší: formulář se dá zneužít jako přeposílač. Oběť
+  dostane e-mail, který skutečně přijde z vaší domény, takže mu věří. Obsah
+  může být cokoli – výzva k platbě, odkaz na podvodné stránky, žádost
+  o přihlašovací údaje.
 
- S8 — Obchodní podmínky jsou z roku 2020 a neúplné  ZÁVAŽNOST: STŘEDNÍ
-   KDE: obchodni-podminky-vzv-car-servis.pdf — jediná stránka, v metadatech
-        název "…12_10_2020.docx", text se odvolává na "zakázkový list na
-        druhé straně této listiny", která v souboru není.
-   CO LZE UDĚLAT: neúplné podmínky se špatně vymáhají; chybí ceník,
-        na který text odkazuje.
-   OPRAVA: nové podmínky včetně reklamací, odpovědnosti za vady a výhrady
-        vlastnictví, nahrát celý dokument.
-   STAV: neopraveno.
+  A třetí: zahlcení disku nahrávanými soubory (souvisí s chybou 1).
 
- S9 — Formulář sbírá fotografie bez pravidel          ZÁVAŽNOST: STŘEDNÍ
-   KDE: kontaktní formulář, "Nahrajte fotografie".
-   CO LZE UDĚLAT: na fotkách bývají poznávací značky, doklady na palubní
-        desce nebo náhodní kolemjdoucí — to jsou osobní údaje. Bez
-        informace o účelu, době uložení a výmazu.
-   OPRAVA: omezit typ a velikost, ukládat mimo veřejný adresář,
-        automaticky mazat (např. po 90 dnech), doplnit informaci do
-        formuláře.
-   STAV: částečně (nahrávání vypnuto).
+  Zvlášť nepříjemný je vedlejší efekt. Když začne vaše doména rozesílat spam,
+  dostane se na černé listiny a přestanou chodit i ty e-maily, které chodit
+  mají – poptávky, faktury, nabídky. Odblokování trvá týdny.
 
- S10 — Nejednotná adresa webu (s www a bez www)       ZÁVAŽNOST: STŘEDNÍ
-   KDE: web funguje na obou variantách a skript searchbox.js posílá
-        vyhledávání na https://vzvcarservis.cz/vyhledavani/ (bez www).
-   CO LZE UDĚLAT: duplicitní obsah pro vyhledávače, zbytečná přesměrování,
-        nejednotné cookies.
-   OPRAVA: trvalé přesměrování (301) na jednu variantu a HTTPS.
-   STAV: doplněno v .htaccess, ověřit na serveru.
+Jak to opravit:
+  Na serveru ověřovat reCAPTCHA (kontrolovat parametr g-recaptcha-response,
+  ne jen to, že je na stránce). Přidat CSRF token, honeypot proti robotům
+  a omezení počtu odeslání z jedné IP adresy. Omezit přílohy na jpg a png,
+  maximálně 5 MB a 5 souborů. Do formuláře doplnit zaškrtávací políčko
+  s odkazem na zásady zpracování osobních údajů (viz chyba 6).
 
- S11 — Chybí ochrana proti "MIME sniffingu"           ZÁVAŽNOST: STŘEDNÍ
-   KDE: server neposílá X-Content-Type-Options: nosniff ani
-        Content-Disposition u PDF.
-   CO LZE UDĚLAT: prohlížeč může soubor vyložit jinak, než server
-        zamýšlel (např. PDF, které se chová jako HTML).
-   OPRAVA: hlavičky z K3.
-   STAV: připraveno v .htaccess.
+Stav:
+  Částečně. Nebezpečné nahrávání je vypnuté (chyba 1), serverová část
+  zůstává k doplnění.
 
- S12 — Web poskytuje kompletní podklad pro podvod na účetní
-                                                       ZÁVAŽNOST: STŘEDNÍ
-   KDE: kontakty/ — jméno, funkce, mobil a e-mail hlavní účetní.
-   CO LZE UDĚLAT: útočník zavolá nebo napíše jako "jednatel" a požádá
-        o urgentní platbu na jiný účet. Řada firem na to už doplatila.
-   OPRAVA: dvouosobové schvalování plateb, ověřování změny bankovního
-        spojení telefonátem, školení.
-   STAV: neopraveno (organizační opatření).
+--------------------------------------------------------------------------------
+ 6. CHYBÍ ZÁSADY ZPRACOVÁNÍ OSOBNÍCH ÚDAJŮ (GDPR)
+    Závažnost: VYSOKÁ
+--------------------------------------------------------------------------------
 
+Kde to je:
+  Stránka conditions/ se jmenuje "Podmínky užití", ale obsahuje pouze text
+  o cookies. A ten text je okopírovaný z e-shopu – mluví o "košíku",
+  "přihlášení" a "nákupním procesu". Na web, který nic neprodává přes košík,
+  to vůbec nesedí.
 
-================================================================================
- 5. NÍZKÉ CHYBY — PRŮBĚŽNĚ
-================================================================================
+Co přes ni lze udělat (z pohledu rizika pro firmu):
+  Tady nejde o útočníka, ale o úřad a o důvěru. Kontrola Úřadu pro ochranu
+  osobních údajů může uložit pokutu. Zákazník může podat stížnost, když
+  zjistí, že jeho údaje zpracováváte, aniž by věděl jak a proč. A u B2B
+  zákazníků je tohle citlivé téma – obchodní partner si všimne, že web nemá
+  zásady ochrany údajů, a udělá si obrázek o tom, jak se u vás nakládá
+  s daty obecně.
 
- Každá z nich je drobnost, dohromady ale kazí dojem, výkon a přístupnost.
- Většina je v této verzi už opravená.
+  Na webu chybí: kdo je správce údajů, jaké údaje se z formuláře sbírají
+  a proč, jak dlouho se uchovávají, komu se předávají (Google kvůli měření
+  a reCAPTCHA, agentura kvůli consent skriptu, poskytovatel hostingu),
+  poučení o právech (přístup, oprava, výmaz, námitka, stížnost) a informace
+  o tom, že část údajů jde do USA (Google).
 
- N1  V galeriích chybí 106 fotografií (Přídavná zařízení, Generální opravy,
-     Ruční manipulační technika, Bazar) — v archivní kopii nebyly. Odkazy
-     jsem ponechal, po nasazení na server s adresářem
-     editorweb/filemanager/files/89/ se načtou.
- N2  Chybí soubor simple-lightbox.jquery.min.js, takže se fotky v galeriích
-     nerozkliknou. Nutno doplnit z původního systému.
- N3  CSS odkazuje na /images/hero.png, /images/hero1.png a /images/provoz.jpg,
-     které na serveru nejsou.
- N4  Odkaz na obrázek "nase-sluzby.png.png" — dvojitá přípona.
- N5  Materialize se načítalo dvakrát (identický soubor). OPRAVENO.
- N6  Dvojitý meta tag viewport. OPRAVENO.
- N7  Neplatné telefonní odkazy — mezery v čísle, chybějící "+", jeden odkaz
-     vedl na https://…/tel+420%20607… OPRAVENO (54 odkazů).
- N8  Stejný mobil 602 790 180 je uvedený u dvou různých osob (Vágner
-     i Dvořáčková). Doporučuji zkontrolovat.
- N9  U Ondřeje Poslušného je jako "Mob" uvedená pevná linka 469 667 178.
- N10 Popisky obrázků (alt) jsou zkrácené generátorem: "elní", "YUNDAI",
-     "APSTAN", "dtahová". Škodí čtečkám i vyhledávačům.
- N11 U 46 obrázků chyběl popisek alt. OPRAVENO (prázdný alt = dekorativní).
- N12 Popisek formulářového pole odkazoval na neexistující id. OPRAVENO.
- N13 Stránka sluzby/ měla titulek "služby" malým písmenem a téměř žádný
-     obsah. Titulek OPRAVEN, obsah doporučuji doplnit.
- N14 Formulář na statickém hostingu nic neodešle a vyhledávání
-     /vyhledavani/ na webu neexistuje — nutné napojit na systém.
- N15 Našeptávač ve vyhledávání nabízí "Volné pozice", "Mechanik čtyřkolek
-     a motorek CF MOTO" a "Servis motocyklů a čtyřkolek" — takové stránky
-     neexistují.
- N16 Widget otevírací doby je okopírovaný od jiného klienta: v kódu je
-     "NABYTEK MIGRO" a klíč nabytekmigroWidgetSeen_v1.
- N17 Ve widgetu je zadrátované vánoční promo do 18. 12. 2025 a
-     "zpět od 05. 01. 2026" — už propadlé.
- N18 Widget se sám otevírá každých 7 sekund, ukládá stav do prohlížeče bez
-     souvislosti se souhlasem a zobrazuje mobil jednatele místo ústředny.
- N19 Zbytky jiných projektů: CSS pro tarteaucitron bez knihovny, prázdné
-     style="height:px" u slideru, komentáře "custom js".
- N20 Překlepy: "vykonát" → "vykonat", "porezentaci" → "prezentaci",
-     "více jak 34letou" → "více než 34letou", "NOVÝ"/"novÝ",
-     "1 t / 1600 mm -" vs "1 t / 2500 mm –".
-     V textu "O společnosti" je odkaz na www.privesycarservis.cz, ale
-     skutečný e-shop je privesyskladem.cz — ověřte, zda nejde o překlep.
- N21 Chyběly robots.txt, sitemap.xml, stránka 404 a kanonické adresy.
-     DOPLNĚNO.
+  U fotografií z formuláře je to ještě citlivější – viz chyba 16.
+
+Jak to opravit:
+  Vytvořit stránku "Zásady ochrany osobních údajů" podle čl. 13 GDPR
+  a stránku "Nastavení cookies" s opravdovým přepínačem, ne s hláškou
+  "pokračováním souhlasíte".
+
+  Do textu o cookies doplnit konkrétní cookies, které web opravdu používá
+  (_ga, _gid, _gcl_au, IDE a podobně), dobu jejich platnosti a příjemce.
+  Do formuláře místo věty "Odesláním souhlasíte s podmínkami užití" dát
+  odkaz na zásady a zaškrtávací políčko.
+
+  Text by měl projít právníkem. Není to kód, je to dokument, a špatně
+  napsané zásady jsou horší než žádné, protože vytvářejí falešný dojem
+  souladu.
+
+Stav:
+  Neopraveno. Vyžaduje součinnost s právníkem.
+
+--------------------------------------------------------------------------------
+ 7. OSOBNÍ ÚDAJE ZAMĚSTNANCŮ NA VEŘEJNÉM WEBU
+    Závažnost: VYSOKÁ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Stránka kontakty/. Sedm osob s funkcí, přímým mobilem a e-mailem – včetně
+  jednatele (608 988 809) a hlavní účetní (778 094 428). E-maily jsou ve
+  formátu prijmeni@vzvcarservis.cz, takže se dají snadno uhodnout i pro
+  lidi, kteří na webu uvedení nejsou.
+
+Co přes ni lze udělat:
+  Tohle není únik dat – zveřejnili jste to sami a na obchodní kontakty máte
+  právo. Riziko je jinde: dáváte útočníkovi přesný návod, koho oslovit a jak.
+
+  Nejčastější scénář, který u podobných firem vídám, je podvod s fakturou.
+  Útočník napíše na adresu účetní jako jednatel: "změnili jsme banku, tady je
+  nové číslo účtu, fakturu zaplaťte dnes". Nebo zavolá. Když má člověk na
+  webu jméno, funkci i mobil, je to důvěryhodnější.
+
+  Dál jde o hromadný spam, vydírání (e-maily jsou veřejné a sbírají je
+  roboti) a sestavení organizační struktury firmy pro další postup.
+
+Jak to opravit:
+  Zvažte, jestli účetní a jednatel potřebují na webu přímý mobil. Často
+  stačí centrální linka 469 667 178 a adresa typu ucetni@ nebo info@.
+  U ostatních kontaktů může pomoct formulář nebo alespoň e-mail obrácený
+  tak, aby ho roboti neposbírali.
+
+  Důležitější než web je ale e-mailová část, viz chyba 14: SPF, DKIM a DMARC
+  v režimu p=reject, dvoufázové přihlášení k e-mailu a interní pravidlo, že
+  změna bankovního spojení se vždy ověřuje zpětným telefonátem na číslo
+  z rejstříku, nikdy z e-mailu.
+
+  Doporučuji i školení zaměstnanců – jednou ročně, krátce, s ukázkou
+  skutečného podvodného e-mailu. Lidé si to zapamatují víc než z prezentace.
+
+Stav:
+  Neopraveno. Je to rozhodnutí firmy, ne technická chyba.
 
 
 ================================================================================
- 6. CO JSEM NAOPAK NENAŠEL
+ ČÁST 3 — STŘEDNÍ CHYBY
 ================================================================================
 
- Pro úplnost, protože se to často řeší: v žádné části webu jsem nenašel
- uložené heslo, přihlašovací údaje, privátní klíč, konfigurační soubor,
- zálohu databáze ani osobní údaje zákazníků. Nic z toho na webu neleží.
+--------------------------------------------------------------------------------
+ 8. GOOGLE MAPS API KLÍČ NA VEŘEJNÉ STRÁNCE
+    Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
 
- Co se "tajemstvím" jen tváří:
-   - Google Maps API klíč — veřejný u každého vloženého Google Maps, ale
-     musí být omezený (viz S1).
-   - reCAPTCHA site key a ID Google Tag Manageru — veřejné ze své
-     podstaty, v pořádku.
-   - dva ověřovací tokeny Google Search Console — viz S2.
+Kde to je:
+  V kopii mapového podkladu, který se načítal na stránce Kontakty, byl klíč:
 
- V archivní kopii cizího e-shopu (S6) ale byly klíče a interní cesty jeho
- administrace. Odstraněním klonů z webu to zmizelo.
+      AIzaSyCmL18misQw9KdwqGaw3zHkitj8vG6QF2Y
+
+Co přes ni lze udělat:
+  Klientské klíče Googlu jsou veřejné ze své podstaty – musí být v prohlížeči,
+  aby mapa fungovala. Problém nastane, když klíč není omezený. Pak ho může
+  kdokoli vzít, napojit na svůj web nebo aplikaci a čerpat váš limit. Fakturu
+  za Google Maps platíte vy a útočník nemusí udělat nic složitého.
+
+Jak to opravit:
+  V Google Cloud Console omezit klíč na HTTP referrer
+  https://www.vzvcarservis.cz/*, povolit jen Maps Embed API, nastavit
+  upozornění na rozpočet a klíč rotovat. Rotace je nutná i přesto, že ho nová
+  verze webu už nepoužívá – byl veřejně dostupný.
+
+Stav:
+  V nové verzi webu je místo klíče mapa bez klíče. Rotace a omezení
+  původního klíče je stále potřeba.
+
+--------------------------------------------------------------------------------
+ 9. DVĚ RŮZNÁ OVĚŘENÍ GOOGLE SEARCH CONSOLE
+    Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  V hlavičce stránek jsou dva meta tagy google-site-verification:
+
+      H8Hi46FoSP6pHYY_u6xLQ0CqvPJGZ9V2AIYydWaRM6A
+      lM0wWOQjyKLnhk1ti8ZymYLNkC572bIDbbh96iX5Cu4
+
+Co přes ni lze udělat:
+  Každý token znamená, že nějaký Google účet ověřil, že mu doména patří.
+  Dva tokeny znamenají dva účty. Pravděpodobně jeden váš a jeden agentury
+  z minulosti.
+
+  Ten druhý účet vidí data o návštěvnosti, může měnit nastavení pro
+  vyhledávače a v některých případech nechat z webu odstranit stránky.
+  Pokud o něm nevíte, je to přístup, který vám nikdo nespravuje.
+
+Jak to opravit:
+  Zjistit, komu token patří (v Search Console je u každé vlastnosti seznam
+  uživatelů). Nepoužívaný token z HTML odstranit a vlastnost v Search Console
+  odebrat. Zároveň nastavit, kdo má do Search Console přístup a v jaké roli.
+
+Stav:
+  Neopraveno – bez znalosti vlastníka to nejde rozhodnout.
+
+--------------------------------------------------------------------------------
+ 10. GOOGLE TAG MANAGER SE NAČÍTÁ DŘÍV NEŽ NASTAVENÍ SOUHLASU
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Na stránkách jsou hned za sebou dva bloky. První načte Google Tag Manager,
+  druhý teprve nastaví výchozí stav souhlasu (consent default).
+
+Co přes ni lze udělat:
+  Google Consent Mode vyžaduje, aby výchozí stav "odmítnuto" byl v datové
+  vrstvě dřív, než se GTM načte. Tady je to opačně. GTM tedy může stihnout
+  založit analytické a marketingové cookies dřív, než se návštěvník rozhodne.
+
+  Pro vás to znamená riziko při kontrole ÚOOÚ a při stížnosti návštěvníka.
+  A také to znehodnocuje vaši cookie lištu – formálně existuje, ale technicky
+  se dá obejít.
+
+Jak to opravit:
+  Nastavit consent default v hlavičce stránky před načtením GTM. Nebo GTM
+  vůbec nenačítat, dokud návštěvník neklikne – consent skript to umí, jen se
+  musí použít správně.
+
+  Ověření je jednoduché: otevřete web v prohlížeči, neklikněte na liště
+  a podívejte se do Developer Tools → Application → Cookies. Neměla by tam
+  být _ga ani _gcl_au.
+
+Stav:
+  Neopraveno.
+
+--------------------------------------------------------------------------------
+ 11. ÚDAJE O NÁVŠTĚVNÍCÍCH SE POSÍLAJÍ NA CIZÍ SERVER
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  V souboru consent skriptu od agentury:
+
+      xhr.open('POST', 'https://getup.cz/cookie-endpoint.php', true);
+      xhr.send('analyticsConsent=...&marketingConsent=...&domain=' + hostname);
+
+  Web tedy posílá informaci o volbě souhlasu a doménu na server agentury.
+  Navíc si stahuje statistiky a vypisuje je do konzole prohlížeče.
+
+Co přes ni lze udělat:
+  Jde o předání údajů dalšímu zpracovateli. Pokud to není v zásadách ochrany
+  osobních údajů a nemáte s agenturou podepsanou smlouvu o zpracování, je to
+  při kontrole problém. A i kdyby všechno bylo správně, je to zbytečná
+  závislost: když agentura endpoint vypne, lišta přestane fungovat.
+
+Jak to opravit:
+  Endpoint vypnout, nebo ho přesunout na vaši doménu. Do zásad ochrany
+  osobních údajů doplnit, kdo je zpracovatel a co se mu posílá.
+
+Stav:
+  Skript je v nové verzi webu lokálně, ale komunikace s getup.cz zůstává.
+  Musí se rozhodnout, jestli ji chcete, nebo ne.
+
+--------------------------------------------------------------------------------
+ 12. OBRÁZEK SE TAHAL Z VÝVOJOVÉHO SERVERU AGENTURY
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  V hlavním CSS souboru byl odkaz:
+
+      https://vzvcarservis.getup.cz/editorweb/filemanager/files/.../nase-sluzby.png.png
+
+Co přes ni lze udělat:
+  Produkční web tahal obrázek z vývojového serveru. Ten vidí IP adresy
+  návštěvníků a referer, tedy odkud přišli. Pokud vývojový server není
+  chráněný, je veřejně dostupná i stará nebo rozpracovaná verze webu – to je
+  duplicitní obsah pro vyhledávače a někdy i testovací funkce, které na
+  produkci být nemají.
+
+  A když agentura staging vypne, obrázek zmizí.
+
+Jak to opravit:
+  Obrázek přesunout k vám (v nové verzi je to hotové). Vývojový server
+  vypnout, nebo ho chránit přihlášením a hlavičkou noindex.
+
+Stav:
+  Opraveno.
+
+--------------------------------------------------------------------------------
+ 13. V ARCHIVNÍ KOPII BYLY CELÉ WEBY CIZÍCH FIREM
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Při stahování webu se automaticky stáhly i celé weby, na které odkazoval:
+  12 MB e-shopu privesyskladem.cz a 6,6 MB webu cfmotoservis.cz.
+
+  Uvnitř byl mimo jiné kompletní JavaScript administrace e-shopu, přihlašovací
+  API (včetně obnovy hesla), klíč dopravce Packeta a033c6f5889374c4
+  a obejití antispamu typu antispam_token = "verified_human".
+
+Co přes ni lze udělat:
+  Kdyby se archiv nahrál na web tak, jak byl, publikovali byste pod svou
+  doménou cizí obsah. To je otázka autorských práv a ochranných známek,
+  duplicitní obsah pro vyhledávače a prozrazení vnitřku cizí administrace.
+  Packeta klíč je veřejný (patří k widgetu), ale i tak se má ověřit, že je
+  svázaný s doménou.
+
+  Naštěstí šlo o veřejně dostupné soubory, ne o únik databáze. Přesto to na
+  web nepatří.
+
+Jak to opravit:
+  Klony z webu odstranit (v nové verzi jsou pryč) a odkazy vést na skutečné
+  weby. Do budoucna weby nestahovat archivátorem bez kontroly, co se stáhlo.
+
+Stav:
+  Opraveno.
+
+--------------------------------------------------------------------------------
+ 14. E-MAILOVÁ DOMÉNA BEZ OCHRANY PROTI PODVRŽENÍ
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Z webu to poznat není, ověřuje se to v DNS. Dva příkazy stačí:
+
+      dig +short TXT vzvcarservis.cz | grep -i spf
+      dig +short TXT _dmarc.vzvcarservis.cz
+
+Co přes ni lze udělat:
+  Bez SPF, DKIM a DMARC může kdokoli rozeslat e-mail, který bude vypadat, že
+  přišel od vás. Adresa odesílatele bude vase@vzvcarservis.cz, hlavičky sedí,
+  podpis chybí – a většina příjemců si toho nevšimne.
+
+  Takhle vypadá drtivá většina úspěšných podvodů s fakturami. Nejde o techniku,
+  jde o to, že lidé věří jménu firmy.
+
+Jak to opravit:
+  SPF s koncovkou -all, platný DKIM, DMARC s p=reject a pct=100, ideálně
+  i DNSSEC a uzamčení domény u registrátora (registry lock), aby ji nikdo
+  nepřesměroval. Nastavit hlášení DMARC na adresu, kterou opravdu čtete.
+
+Stav:
+  Mimo web. Nutno ověřit u poskytovatele DNS a e-mailu.
+
+--------------------------------------------------------------------------------
+ 15. OBCHODNÍ PODMÍNKY JSOU Z ROKU 2020 A NEÚPLNÉ
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  PDF v patičce, obchodni-podminky-vzv-car-servis.pdf. V metadatech má název
+  "…12_10_2020.docx" a má jedinou stránku. Text se přitom odvolává na
+  "zakázkový list na druhé straně této listiny" – ta v souboru není. Zároveň
+  odkazuje na ceník na internetových stránkách, který na webu není.
+
+Co přes ni lze udělat:
+  Neúplné a neaktuální podmínky se špatně vymáhají. Kdyby došlo na spor
+  o zaplacení nebo o reklamaci, budete se opírat o dokument, který odkazuje
+  na něco, co neexistuje.
+
+Jak to opravit:
+  Nové podmínky včetně reklamací, odpovědnosti za vady a výhrady vlastnictví.
+  Nahrát celý dokument, ne jen první stránku, a zkontrolovat, že odkazy
+  v něm opravdu vedou na existující stránky.
+
+Stav:
+  Neopraveno.
+
+--------------------------------------------------------------------------------
+ 16. FORMULÁŘ SBÍRÁ FOTOGRAFIE BEZ PRAVIDEL
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Kontaktní formulář, část "Nahrajte fotografie".
+
+Co přes ni lze udělat:
+  Na fotkách z dílny bývají poznávací značky, doklady na palubní desce nebo
+  náhodní kolemjdoucí. To všechno jsou osobní údaje. Ukládat je bez informace
+  o účelu, době uložení a možnosti výmazu je problém.
+
+  Navíc fotky končí v redakčním systému bez moderace, takže se do nich dá
+  nahrát cokoli, co se tam nehodí.
+
+Jak to opravit:
+  Omezit na jpg a png, maximálně 5 MB a 5 souborů, ukládat mimo veřejný
+  adresář, automaticky mazat (například po 90 dnech) a do formuláře doplnit
+  informaci, co se s fotkami děje a jak dlouho tam budou.
+
+Stav:
+  Částečně – nahrávání je v nové verzi vypnuté.
+
+--------------------------------------------------------------------------------
+ 17. NEJEDNOTNÁ ADRESA WEBU (S WWW A BEZ WWW)
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Web funguje na obou variantách a vyhledávací skript posílá dotazy na
+  https://vzvcarservis.cz/vyhledavani/ (bez www), zatímco zbytek webu
+  používá www.
+
+Co přes ni lze udělat:
+  Duplicitní obsah pro vyhledávače, zbytečná přesměrování a nejednotné
+  cookies. Nic dramatického, ale je to zbytečná ztráta výkonu i pozic.
+
+Jak to opravit:
+  Trvalé přesměrování (301) na jednu variantu a vynucené HTTPS.
+  V nové verzi je to v .htaccess, na serveru je potřeba ověřit.
+
+Stav:
+  Připraveno, nutno nasadit.
+
+--------------------------------------------------------------------------------
+ 18. CHYBÍ OCHRANA PROTI "MIME SNIFFINGU"
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Server neposílá hlavičku X-Content-Type-Options: nosniff ani
+  Content-Disposition u PDF.
+
+Co přes ni lze udělat:
+  Prohlížeč si může soubor vyložit jinak, než server zamýšlel. Klasický
+  případ je soubor, který se tváří jako PDF, ale uvnitř je HTML stránka.
+  Tomu se dá předejít jedinou hlavičkou.
+
+Jak to opravit:
+  Hlavičky z chyby 3.
+
+Stav:
+  Připraveno v nové verzi.
+
+--------------------------------------------------------------------------------
+ 19. WEB POSKYTUJE KOMPLETNÍ PODKLAD PRO PODVOD NA ÚČETNÍ
+     Závažnost: STŘEDNÍ
+--------------------------------------------------------------------------------
+
+Kde to je:
+  Stránka kontakty/ – jméno, funkce, mobil a e-mail hlavní účetní.
+
+Co přes ni lze udělat:
+  Tohle je scénář, který už stál spoustu firem peníze. Útočník napíše nebo
+  zavolá "od jednatele": letíme na dovolenou, změnili jsme banku, tady je
+  nové číslo účtu, fakturu prosím zaplaťte dnes. Když má útočník jméno,
+  funkci a mobil, je to věrohodné. Když navíc dokáže podvrhnout e-mailovou
+  adresu (chyba 14), je to téměř dokonalé.
+
+Jak to opravit:
+  Dvouosobové schvalování plateb nad určitou částku. Ověřování změny
+  bankovního spojení telefonátem na číslo z rejstříku, ne z e-mailu.
+  Školení účetního oddělení. A domluva s bankou na limitech.
+
+Stav:
+  Neopraveno. Organizační opatření, web s tím umí jen pomoct (méně údajů).
 
 
 ================================================================================
- 7. DOPORUČENÍ — JAK SE BRÁNIT
+ ČÁST 4 — NÍZKÉ CHYBY
 ================================================================================
 
- 7.1 IHNED (do 24 hodin)
-  1. Ověřit a zabezpečit /editorweb/lib/upload.php (K1). Pokud je
-     přístupný, považovat server za napadený a projít logy i nahrané
-     soubory.
-  2. Zabezpečit administraci: silné heslo, dvoufázové přihlášení,
-     omezení podle IP, smazat instalační a testovací soubory (K2).
-  3. Omezit a rotovat Google Maps klíč a zrušit neznámý token
-     v Search Console (S1, S2).
+Tyhle chyby samotný web neohrozí, ale dohromady kazí dojem, výkon a přístupnost.
+Většina z nich je v nové verzi už opravená.
 
- 7.2 DO TÝDNE
-  4. Nasadit bezpečnostní hlavičky a vynutit HTTPS (K3, S10, S11).
-  5. Zkontrolovat DNS: SPF, DKIM, DMARC s "p=reject", DNSSEC a uzamčení
-     domény (S7).
-  6. Doplnit zásady zpracování osobních údajů a nastavení cookies (K6),
-     upravit text u formuláře (K5, S9).
-  7. Opravit pořadí načítání Google Tag Manageru a vypnout reporting
-     na cizí server (S3, S4).
+20. V galeriích chybí 106 fotografií [NÍZKÁ]
+    V archivech nebyly fotky pro stránky Přídavná zařízení, Generální opravy,
+    Ruční manipulační technika a Bazar. Odkazy jsem ponechal – po nasazení
+    na server, kde adresář editorweb/filemanager/files/89/ existuje, se
+    načtou. Pokud web poběží samostatně, je potřeba fotky doplnit.
 
- 7.3 DO MĚSÍCE
-  8. Aktualizovat jQuery a Materialize, sloučit ikonové fonty (K4).
-  9. Doplnit serverovou validaci formuláře, CSRF token a omezení počtu
-     odeslání (K5).
- 10. Vytvořit nové obchodní podmínky a nahrát celý dokument (S8).
- 11. Doplnit chybějící fotografie a lightbox (N1, N2) a opravit popisky
-     obrázků (N10).
- 12. Zvážit omezení osobních kontaktů na webu (K7) a nastavit pravidla
-     proti podvodům s fakturami (S12).
- 13. Nastavit monitoring dostupnosti a zálohování.
+21. Chybí lightbox [NÍZKÁ]
+    Soubor simple-lightbox.jquery.min.js na webu není, takže se fotky
+    v galeriích nerozkliknou. Doplňte ho z původního systému, nebo použijte
+    jinou galerii.
 
- 7.4 DLOUHODOBĚ — organizační opatření (mimo web)
-  - Dvoufázové přihlášení všude: e-mail, hosting, doména, administrace,
-    banka. Silná unikátní hesla v password manageru.
-  - Zálohy "3-2-1" (tři kopie, dvě různá média, jedna mimo budovu)
-    a alespoň jednou ročně vyzkoušet obnovu. Záloha, kterou nejde
-    obnovit, není záloha.
-  - Uzamčená doména u registrátora (registry lock) a přehled, kdo má
-    k doméně, DNS a hostingu přístup.
-  - Pravidelná aktualizace redakčního systému a knihoven, ideálně
-    s dohodnutým termínem v servisní smlouvě s dodavatelem.
-  - Školení zaměstnanců proti phishingu (alespoň jednou ročně) a
-    zkušební "podvrh" e-mailu.
-  - Platební pravidlo: jakákoli změna bankovního spojení se ověřuje
-    zpětným telefonátem na číslo z rejstříku, ne z e-mailu.
-  - Seznam přístupů (kdo, kam, proč) a jejich odebrání při odchodu
-    zaměstnance nebo ukončení spolupráce s dodavatelem.
-  - Plán pro případ incidentu: komu se volá, kdo vypne web, kde jsou
-    zálohy, kdo informuje zákazníky a ÚOOÚ (do 72 hodin).
-  - U dodavatelů (agentura, hosting, e-shop) mít smlouvu o zpracování
-    osobních údajů a jasně dané, kdo odpovídá za aktualizace a za
-    bezpečnost.
+22. CSS odkazuje na tři neexistující obrázky [NÍZKÁ]
+    /images/hero.png, /images/hero1.png a /images/provoz.jpg na serveru
+    nejsou. Buď je doplňte, nebo pravidla z CSS odstraňte.
 
- 7.5 JAK POZNAT, ŽE SE NĚCO DĚJE
-  - V adresáři s nahranými soubory se objeví .php soubor nebo soubor
-    s podivným názvem.
-  - V logu serveru jsou požadavky "POST /editorweb/…" z cizích IP adres.
-  - Web se načítá pomalu, mění se obsah, přibývají odkazy, které jste
-    nevložili.
-  - Z domény začnou chodit spamy nebo se e-maily vrací jako nedoručitelné.
-  - Zákazníci hlásí, že dostali od firmy podezřelý e-mail.
-  - V Search Console přibudou neznámé stránky nebo "ručně udělené akce".
+23. Obrázek s dvojitou příponou [NÍZKÁ]
+    Odkaz na "nase-sluzby.png.png". Pravděpodobně překlep při nahrávání.
+
+24. Materialize se načítalo dvakrát [NÍZKÁ]
+    Identický soubor se stahoval dvakrát, což zdržuje načtení stránky
+    a může způsobit konflikty. OPRAVENO.
+
+25. Dvojitý meta tag viewport [NÍZKÁ]
+    Dva meta tagy pro mobilní zobrazení, jeden přepisoval druhý. OPRAVENO.
+
+26. Neplatné telefonní odkazy [NÍZKÁ]
+    V odkazech byly mezery v čísle, chybělo "+", jeden odkaz vedl na
+    https://…/tel+420%20607… místo na telefon. Na mobilu se tak nedalo
+    dovolat. OPRAVENO (54 odkazů).
+
+27. Stejný mobil u dvou různých osob [NÍZKÁ]
+    Číslo 602 790 180 je uvedené u Jaroslava Vágnera i u Michaely
+    Dvořáčkové. Jeden z údajů je pravděpodobně špatně.
+
+28. "Mob" u technika je ve skutečnosti pevná linka [NÍZKÁ]
+    U Ondřeje Poslušného je jako mobil uvedeno 469 667 178, což je ústředna.
+
+29. Zkrácené popisky obrázků [NÍZKÁ]
+    Popisky typu "elní", "YUNDAI", "APSTAN", "dtahová" vznikly zkrácením
+    názvu v generátoru šablony. Škodí čtečkám pro nevidomé i vyhledávačům.
+
+30. U 46 obrázků chyběl popisek [NÍZKÁ]
+    Doplnil jsem prázdný popisek, což je správně u dekorativních obrázků.
+    U fotografií, které něco znamenají, doporučuji popisky doplnit ručně.
+    OPRAVENO.
+
+31. Popisek formulářového pole mířil na neexistující id [NÍZKÁ]
+    Kliknutí na text "Text zprávy" neumístilo kurzor do pole. OPRAVENO.
+
+32. Stránka Služby má titulek malým písmenem a málo obsahu [NÍZKÁ]
+    Titulek "služby" jsem opravil na "Služby". Obsah je ale pořád jen mřížka
+    dlaždic bez textu – pro vyhledávače je to prázdná stránka. Doporučuji
+    doplnit odstavec o každé službě.
+
+33. Formulář a vyhledávání nejsou v archivu funkční [NÍZKÁ]
+    Formulář odesílá na "?sentform=1", což zpracovává redakční systém na
+    serveru. Vyhledávání /vyhledavani/ také není součástí archivu. Po
+    nasazení na původní server to funguje, na statickém hostingu ne.
+
+34. Našeptávač nabízí stránky, které neexistují [NÍZKÁ]
+    Ve vyhledávání se nabízí "Volné pozice", "Mechanik čtyřkolek a motorek
+    CF MOTO" a "Servis motocyklů a čtyřkolek". Takové stránky na webu
+    nejsou, nabídka vede do prázdna.
+
+35. Widget otevírací doby je z jiného projektu [NÍZKÁ]
+    V kódu je "NABYTEK MIGRO" a klíč nabytekmigroWidgetSeen_v1. Skript
+    vznikl pro jiný e-shop a jen se převzal.
+
+36. Ve widgetu je propadlé vánoční promo [NÍZKÁ]
+    Zadrátované "garance doručení do 18. 12. 2025" a "zpět od 05. 01. 2026".
+    Dnes je to pryč, ale logika tam zůstala a příští rok se ozve znovu.
+
+37. Widget se sám otevírá a ukládá data bez souhlasu [NÍZKÁ]
+    Po jedné sekundě se panel otevře a po sedmi zavře, dokud ho návštěvník
+    nezavře. Stav si pamatuje v prohlížeči, aniž by to souviselo s volbou
+    cookies. Navíc zobrazuje mobil jednatele místo ústředny.
+
+38. Zbytky jiných projektů v kódu [NÍZKÁ]
+    CSS pro tarteaucitron, ale knihovna se nenačítá. Prázdné
+    style="height:px" u slideru. Komentáře "custom js".
+
+39. Překlepy a nekonzistence v textech [NÍZKÁ]
+    "vykonát" místo "vykonat", "porezentaci" místo "prezentaci",
+    "více jak 34letou" místo "více než 34letou", "NOVÝ" a "novÝ" v různých
+    variantách, jednou "1 t / 1600 mm -" a podruhé "1 t / 2500 mm –".
+
+    V textu O společnosti je odkaz na www.privesycarservis.cz, ale skutečný
+    e-shop je privesyskladem.cz. Ověřte, jestli nejde o překlep nebo
+    o doménu, která už neexistuje.
+
+    Právní odkazy (§ 134b zákoníku práce, ČSN 26 88 05, nařízení vlády
+    378/2001) doporučuji ověřit – citace norem mají být jednotné
+    (ČSN 26 8805) a měly by odpovídat platnému znění.
+
+40. Chyběly robots.txt, sitemap, stránka 404 a kanonické adresy [NÍZKÁ]
+    Vyhledávače neměly mapu webu, neexistovala stránka pro nenalezenou
+    adresu a stránky neměly kanonickou URL. DOPLNĚNO.
 
 
 ================================================================================
- 8. ZÁVĚR
+ ČÁST 5 — TŘI SCÉNÁŘE, JAK TO MŮŽE SKONČIT
 ================================================================================
 
- Většinu technických chyb, které šly opravit přímo v souborech webu, jsem
- opravil a nová verze je připravená k nasazení — seznam je v souboru
- AUDIT.md, oddíl 8. Zůstávají tři okruhy, které za vás nikdo z kódu
- nevyřeší:
+Nechci vás strašit, ale u auditu má smysl ukázat, jak se jednotlivé chyby
+skládají dohromady. Tohle jsou tři cesty, které vidím jako reálné.
 
-   1. serverová část redakčního systému (K1, K2, K5) — musí se ověřit
-      a nastavit přímo na hostingu,
-   2. právní texty (K6, S8) — zásady ochrany osobních údajů a obchodní
-      podmínky,
-   3. organizační opatření (K7, S7, S12) — e-mailová doména, phishing,
-      platby, zálohy a přístupy.
+Scénář první – bez jediného technického exploitu (nejpravděpodobnější)
 
- Pokud budete chtít, rád vám pomohu s ověřením oprav, s nastavením
- bezpečnostních hlaviček a s kontrolou, zda je server po opravě skutečně
- uzavřený.
+  Přijde e-mail, který vypadá jako od hostingu: "vaše schránka je plná,
+  přihlaste se". Někdo z firmy klikne a zadá heslo. Stejné heslo používá
+  i do redakčního systému. Útočník se přihlásí do /editorweb/, otevře
+  správce souborů a nahraje skript. Server je jeho.
 
- Děkuji za pozornost a za odpovědný přístup k bezpečnosti.
+  Všimněte si, že v tomhle scénáři nehrála roli žádná chyba v kódu.
+  Jen lidský faktor a chybějící dvoufázové přihlášení. Proto je chyba 2
+  důležitější než jakákoli "zajímavá" zranitelnost z bezpečnostních zpráv.
 
- Přeji hezký den
- Matěj Volejník
+Scénář druhý – z veřejné části do administrace
+
+  Útočník využije starou knihovnu a do stránky dostane skript. Odkaz pošle
+  správci webu. Ten na něj klikne, protože přichází z vaší domény, a skript
+  v jeho prohlížeči udělá totéž, co by udělal správce – přidá si účet,
+  změní obsah, stáhne data.
+
+  Tohle je důvod, proč se administrace posílá na samostatnou doménu a proč
+  je CSP užitečná i ve chvíli, kdy si myslíte, že se vás XSS netýká.
+
+Scénář třetí – dodavatel
+
+  Prolomený e-mail někoho z agentury. Ten má přístup do Google Tag Manageru
+  nebo na hosting. Do všech stránek vloží skript, který sbírá, co lidé píší
+  do formulářů, a tiše přesměruje část návštěvníků na podvodnou stránku.
+
+  Na serveru se přitom nezmění jediný soubor. Všechno je v GTM, kde to nikdo
+  nekontroluje. Tohle je nejtišší cesta a odhalí se jen tím, že se do GTM
+  občas někdo podívá a že se čtou logy.
+
 
 ================================================================================
+ ČÁST 6 — CO BYSTE MĚLI VIDĚT, KDYŽ SE NĚCO DĚJE
+================================================================================
+
+Prevence je půlka práce, druhá půlka je všimnout si včas. Tohle jsou signály,
+které stojí za to sledovat – a u většiny z nich stačí mít zapnutá upozornění
+z hostingu.
+
+  - V adresáři s nahranými soubory se objeví soubor, který tam nepatří.
+    Zejména soubory .php, .phtml nebo cokoli s podivnou příponou.
+  - Kdekoli na serveru se objeví neznámý .php soubor. To je téměř vždy
+    webshell.
+  - V redakčním systému přibude uživatel, kterého jste nepřidali.
+  - V Google Tag Manageru přibude značka nebo pravidlo, které jste
+    nenastavili.
+  - V DNS přibude záznam, který jste nepřidali, nebo se změní směřování
+    domény.
+  - Z domény začnou odcházet e-maily, které jste neposlali, nebo začnou
+    chodit stížnosti na spam.
+  - Web se najednou načítá pomalu, mění se velikost stránek, datum poslední
+    změny nesedí s vaší prací.
+  - V Google Search Console přijde varování "hacked site" nebo "deceptive
+    pages". To znamená, že si problému všiml už vyhledávač – tedy pozdě,
+    ale ještě se dá reagovat.
+  - Na doménu se objeví nový certifikát v CT logu, který jste nevydali.
+  - Zákazníci volají, že jim prohlížeč zobrazuje varování.
+
+Základní hygiena, která tyhle signály zachytí: upozornění z hostingu na
+e-mail, jednou týdně pohled do adresáře s nahranými soubory, přístup do
+Search Console, monitoring dostupnosti a zálohy, u kterých jste si jisti,
+že je umíte obnovit. Ne že existují – že je umíte obnovit.
+
+
+================================================================================
+ ČÁST 7 — DOPORUČENÍ, JAK SE BRÁNIT
+================================================================================
+
+Seřadil jsem to podle toho, co bych dělal první a co počká.
+
+Dnes
+
+  1. Ověřit, jestli je nahrávání souborů (chyba 1) opravdu otevřené.
+     Pokud ano, brát server jako napadený a projít logy i nahrané soubory.
+  2. Zapnout dvoufázové přihlášení do administrace a změnit heslo.
+     Odstranit instalační a testovací soubory.
+  3. Omezit a rotovat Google Maps klíč (chyba 8). Odebrat neznámý token
+     ze Search Console (chyba 9).
+
+Tento týden
+
+  4. Nasadit bezpečnostní hlavičky a vynutit HTTPS (chyby 3, 17, 18).
+  5. Zkontrolovat DNS: SPF, DKIM, DMARC s p=reject, DNSSEC, uzamčení
+     domény (chyba 14).
+  6. Opravit pořadí načítání Google Tag Manageru a rozhodnout, jestli
+     consent skript má posílat data na getup.cz (chyby 10, 11).
+
+Tento měsíc
+
+  7. Doplnit zásady ochrany osobních údajů a nastavení cookies (chyba 6).
+     Upravit text u formuláře a pravidla pro fotografie (chyby 5, 16).
+  8. Zabezpečit formulář na serveru: validace, CSRF token, ověření
+     reCAPTCHA, omezení počtu odeslání (chyba 5).
+  9. Vytvořit nové obchodní podmínky a nahrát celý dokument (chyba 15).
+ 10. Rozhodnout o rozsahu osobních kontaktů na webu (chyby 7, 19).
+
+Tento kvartál
+
+ 11. Aktualizovat jQuery a Materialize, sloučit ikonové fonty (chyba 4).
+ 12. Doplnit chybějící fotografie, lightbox a popisky obrázků (chyby 20–22,
+     29, 30).
+ 13. Zavést CSP nejdřív v režimu report-only, pak zostřit.
+ 14. Nastavit monitoring dostupnosti a zálohování s testem obnovy.
+
+Dlouhodobě – organizační opatření
+
+  Dvoufázové přihlášení všude: e-mail, hosting, doména, administrace, banka.
+  Silná a unikátní hesla v password manageru, žádná hesla v e-mailu ani
+  v sešitě.
+
+  Zálohy "3-2-1" – tři kopie, dvě různá média, jedna mimo budovu. A alespoň
+  jednou ročně zkusit obnovu. Záloha, kterou nejde obnovit, není záloha.
+
+  Uzamčená doména u registrátora a přehled, kdo má k doméně, DNS a hostingu
+  přístup. Tohle je nejčastější slepé místo – firma ví, kdo má heslo do
+  e-shopu, ale neví, kdo má přístup k DNS.
+
+  Pravidelná aktualizace redakčního systému a knihoven, ideálně s termínem
+  v servisní smlouvě s dodavatelem. Ne "když bude čas", ale "do 30 dnů od
+  vydání bezpečnostní opravy".
+
+  Školení zaměstnanců proti phishingu, alespoň jednou ročně, krátce
+  a s ukázkou. Zkušební podvrh e-mailu je nejlepší test, jaký existuje.
+
+  Platební pravidlo: jakákoli změna bankovního spojení se ověřuje zpětným
+  telefonátem na číslo z rejstříku, nikdy z e-mailu. Dvouosobové schvalování
+  plateb nad dohodnutou částku.
+
+  Seznam přístupů – kdo, kam a proč – a jeho odebrání při odchodu
+  zaměstnance nebo ukončení spolupráce s dodavatelem. Přístupy, na které se
+  zapomnělo, jsou nejčastější vstupní brána.
+
+  Plán pro případ incidentu: komu se volá, kdo vypne web, kde jsou zálohy,
+  kdo informuje zákazníky a ÚOOÚ (do 72 hodin). Napsaný na jednu stránku
+  a vytištěný, protože při incidentu se nehledá v dokumentaci.
+
+  U dodavatelů (agentura, hosting, e-shop) mít smlouvu o zpracování osobních
+  údajů a jasně dané, kdo odpovídá za aktualizace a za bezpečnost. Alespoň
+  jednou ročně si vyžádat potvrzení, kdo všechno má k vašim systémům přístup.
+
+
+================================================================================
+ ČÁST 8 — CO JSEM NAOPAK NENAŠEL
+================================================================================
+
+Pro úplnost, protože se na to lidé ptají: v žádné části webu jsem nenašel
+uložené heslo, přihlašovací údaje, privátní klíč, konfigurační soubor,
+zálohu databáze ani osobní údaje zákazníků. Nic z toho na webu neleží a to
+je dobře.
+
+Co se "tajemstvím" jen tváří:
+
+  - Google Maps API klíč – veřejný u každého vloženého Google Maps, ale musí
+    být omezený (chyba 8),
+  - reCAPTCHA site key a ID Google Tag Manageru – veřejné ze své podstaty,
+    v pořádku,
+  - dva ověřovací tokeny Google Search Console – viz chyba 9.
+
+V archivní kopii cizího e-shopu (chyba 13) ale byly klíče a interní cesty
+jeho administrace. Odstraněním klonů z webu to zmizelo.
+
+Pro zajímavost: ve fotkách z toho cizího e-shopu byla i GPS souřadnice
+a model telefonu, kterým byly pořízené. U vašich produkčních fotek nic
+takového není – metadata jsou vymazaná. Přesto doporučuji EXIF při nahrávání
+čistit, protože řada systémů ho tam nechává a u fotek z dílny se tak
+prozradí, kde a kdy vznikly.
+
+
+================================================================================
+ ČÁST 9 — ZÁVĚR
+================================================================================
+
+Většinu technických chyb, které se daly opravit přímo v souborech webu, jsem
+opravil. Zůstávají tři okruhy, které za vás z kódu nikdo nevyřeší:
+
+  1. Serverová část redakčního systému. Ověření nahrávání souborů,
+     zabezpečení administrace a validace formuláře se musí udělat přímo
+     na hostingu (chyby 1, 2, 5).
+  2. Právní texty. Zásady ochrany osobních údajů a obchodní podmínky
+     (chyby 6, 15).
+  3. Organizační opatření. E-mailová doména, phishing, platby, zálohy
+     a přístupy (chyby 7, 14, 19).
+
+Kdybych měl shrnout, co je na tom nejdůležitější: web samotný není ten
+největší problém. Tím je kombinace veřejně inzerované administrace bez
+dvoufázového přihlášení a e-mailové domény, která se dá podvrhnout. První
+vede k převzetí serveru, druhá k podvodu s fakturou. Obojí se dá zavřít
+v řádu dnů a nestojí to skoro nic.
+
+Pokud budete chtít, rád vám pomohu s ověřením oprav, s nastavením
+bezpečnostních hlaviček a s kontrolou, jestli je server po opravě skutečně
+uzavřený. Klidně i tak, že u toho budu jen radit vašemu správci.
+
+Děkuji za pozornost a za odpovědný přístup k bezpečnosti.
+
+Přeji hezký den
+Matěj Volejník
