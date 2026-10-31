@@ -6,10 +6,12 @@ CSS, JS a obrázky. Dohromady tvoří jeden funkční web, který jde otevřít 
 
 **Bezpečnostní audit a seznam všech nalezených rizik: [`AUDIT.md`](AUDIT.md).**
 
-**Zpráva pro vedení firmy (dopis se seznamem chyb a doporučeními):
-[`chybyvzabezpeceni.txt`](chybyvzabezpeceni.txt).** Ten soubor nepatří na veřejný
-web — obsahuje seznam zranitelností. V `.htaccess`, `robots.txt` a `_redirects`
-je proto zablokovaný.
+**Zpráva pro vedení firmy: [`chybyvzabezpeceni.txt`](chybyvzabezpeceni.txt)** —
+kompletní a samostatný dokument: všech 40 nálezů s místem, závažností, dopadem
+a postupem opravy, tři scénáře útoku, varovné signály a doporučení k ochraně.
+Nic dalšího k přečtení nepotřebuje. Soubor nepatří na veřejný web — obsahuje
+seznam zranitelností, proto je zablokovaný v `.htaccess`, `robots.txt`
+a `_redirects`.
 **Jak by se kdo mohl dostat dovnitř: [`AUDIT-UTOKOVE-CESTY.md`](AUDIT-UTOKOVE-CESTY.md).**
 
 ---
