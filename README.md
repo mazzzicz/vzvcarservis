@@ -5,6 +5,7 @@ Archivy byly dva výřezy téhož webu: jeden obsahoval podstránky, druhý koř
 CSS, JS a obrázky. Dohromady tvoří jeden funkční web, který jde otevřít i bez PHP.
 
 **Bezpečnostní audit a seznam všech nalezených rizik: [`AUDIT.md`](AUDIT.md).**
+**Jak by se kdo mohl dostat dovnitř: [`AUDIT-UTOKOVE-CESTY.md`](AUDIT-UTOKOVE-CESTY.md).**
 
 ---
 
