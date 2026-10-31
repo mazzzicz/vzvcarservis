@@ -42,6 +42,11 @@ ErrorDocument 404 /404.html
   Require all denied
 </FilesMatch>
 
+# Zprava o zranitelnostech nesmi byt verejne dostupna
+<Files "chybyvzabezpeceni.txt">
+  Require all denied
+</Files>
+
 # --- Cache statickych souboru ---------------------------------------------
 <IfModule mod_expires.c>
   ExpiresActive On

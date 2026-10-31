@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /editorweb/
 Disallow: /assets/vendor/
+Disallow: /chybyvzabezpeceni.txt
 
 Sitemap: https://www.vzvcarservis.cz/sitemap.xml

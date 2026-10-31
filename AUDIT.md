@@ -38,9 +38,9 @@ jeho administrace (viz V5).
 | K4 | jQuery 2.1.1 (2014) a Materialize 0.98 (2016) — známé CVE, bez záplat | 🟠 vysoká |
 | K5 | Formulář bez CSRF tokenu a bez zjevného serverového ověření reCAPTCHA | 🟠 vysoká |
 | K6 | Chybí zásady zpracování osobních údajů (GDPR) — jen stránka o cookies | 🟠 vysoká |
-| K7 | Zveřejněná jména, přímé mobily a e-maily 8 zaměstnanců (vč. účetní a jednatele) | 🟠 vysoká |
+| K7 | Zveřejněná jména, přímé mobily a e-maily 7 zaměstnanců (vč. účetní a jednatele) | 🟠 vysoká |
 
-Celkem **41 nálezů**, z toho 2 kritické, 6 vysokých, 12 středních a 21 nízkých / obsahových.
+Celkem **40 nálezů**, z toho 2 kritické, 5 vysokých, 12 středních a 21 nízkých / obsahových.
 Všechny opravitelné položky, které šly opravit v rámci sloučení webu, jsou opravené
 (viz [oddíl 8](#8-co-je-v-tomto-repu-opravené)).
 
@@ -244,7 +244,7 @@ platnosti a příjemce.
 
 ### K7 — Osobní údaje zaměstnanců
 
-Na Kontaktech je 8 osob s přímým mobilem a e-mailem:
+Na Kontaktech je 7 osob s přímým mobilem a e-mailem:
 
 | Osoba | Funkce | Co je zveřejněno |
 |-------|--------|------------------|
