@@ -3,6 +3,7 @@
 **Datum:** 31. 10. 2026
 **Rozsah:** kompletní statický archiv webu (23 HTML stránek, 141 souborů, ~9,8 MB) + konfigurační
 a obsahové souvislosti. Původní archivy: `castwebu1.zip`, `castwebu2.zip` (HTTrack mirror).
+**Doplněk:** [`AUDIT-UTOKOVE-CESTY.md`](AUDIT-UTOKOVE-CESTY.md) — konkrétní scénáře, jak by se kdo mohl dostat dovnitř (a jak to zavřít).
 **Metoda:** ruční revize HTML/CSS/JS, kontrola odkazů a assetů, analýza metadat souborů
 (EXIF, PDF), kontrola knihoven a jejich verzí, rešerše zveřejněných údajů, kontrola GDPR
 náležitostí a provozních rizik.
